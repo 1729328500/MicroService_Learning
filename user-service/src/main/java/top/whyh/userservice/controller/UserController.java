@@ -1,14 +1,24 @@
 package top.whyh.userservice.controller;
 
 import jakarta.annotation.Resource;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import top.whyh.userservice.entity.User;
+import top.whyh.userservice.service.UserService;
 
 @RestController
+@RequestMapping("/user")
+@AllArgsConstructor
 public class UserController {
+    private final UserService userService;
+
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable Integer id) {
+        return userService.getFullUserById(id);
+    }
+
 
     @Resource
     private RestTemplate restTemplate;  // 确保使用注入的实例

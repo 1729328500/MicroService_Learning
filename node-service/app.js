@@ -1,60 +1,32 @@
+// app.js
 const express = require("express");
-const { NacosNamingClient } = require("nacos");
 const app = express();
-const port = 8085;
+const port = 3000;
 
-// 简单的日志记录器函数
-function logger() {
-  return {
-    info: console.log.bind(console),
-    error: console.error.bind(console),
-    debug: console.debug.bind(console),
-  };
-}
+// 加载环境变量
+require("dotenv").config();
 
-// 修复后的 Nacos 配置
-const nacosClient = new NacosNamingClient({
-  serverList: "localhost:8848", // 或 ['localhost:8848']
-  namespace: "", // 默认命名空间留空
-  username: "nacos",
-  password: "nacos",
-  logger: logger(), // 提供一个简单的 logger 实例
+// 中间件配置
+app.use(express.json()); // 用于解析 JSON 格式的请求体
+app.use(express.urlencoded({ extended: true })); // 用于解析 URL 编码的请求体
+
+// 路由挂载
+app.use("/api/teacher", require("./routes/teacher")); // 假设 teacher 路由定义在 routes 文件夹下
+
+// 错误处理中间件
+app.use((err, req, res, next) => {
+  console.error(err.stack); // 打印错误堆栈信息
+  res.status(500).send("服务器内部错误"); // 返回 500 错误响应
 });
 
-// ... 其他代码
-
-// 服务注册逻辑
-async function registerService() {
-  try {
-    await nacosClient.ready();
-    await nacosClient.registerInstance("node-service", {
-      ip: "localhost",
-      port: port,
-      serviceName: "node-service", // 明确指定服务名
-    });
-    console.log("Node服务注册成功");
-  } catch (err) {
-    console.error("注册失败:", err);
-  }
-}
-
-// 接口定义
-app.get("/ask", (req, res) => {
-  const question = req.query.question;
-  const username =
-    question.split("生成用户")[1].split("的欢迎语")[0] || "未知用户";
-  res.send(`欢迎您，${username}！`);
+// 启动服务器
+const server = app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
 });
 
-// 启动服务
-app.listen(port, async () => {
-  console.log(`Node服务运行在 http://localhost:${port}`);
-  await registerService();
-});
+// 导出 server 对象以便 Nacos 注册使用
+module.exports = server;
 
-// 优雅关闭
-process.on("SIGINT", async () => {
-  await nacosClient.deregisterInstance("node-service", "localhost", port);
-  console.log("服务已注销");
-  process.exit();
-});
+// 在服务器启动后注册服务
+const { registerService } = require("./nacos-register");
+registerService(server);
