@@ -14,9 +14,9 @@ public class LoadBalancerClientConfiguration {
 
     private static final int REACTIVE_SERVICE_INSTANCE_SUPPLIER_ORDER = 193827465;
 
-    @Bean
-    @ConditionalOnMissingBean
-    public ReactorLoadBalancer<ServiceInstance> reactorServiceInstanceLoadBalancer(Environment environmentLoadBalancerClientFactory loadBalancerClientFactory) {
-        String name = e
-    }
+//    @Bean
+//    @ConditionalOnMissingBean
+//    public ReactorLoadBalancer<ServiceInstance> reactorServiceInstanceLoadBalancer(Environment environmentLoadBalancerClientFactory loadBalancerClientFactory) {
+//        String name = e
+//    }
 }

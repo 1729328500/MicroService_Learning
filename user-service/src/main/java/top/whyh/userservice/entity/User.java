@@ -30,4 +30,10 @@ public class User {
 
     @TableField("update_time")
     private Date updateTime;
+
+    public User(int id, String name) {
+        this.id = id;
+        this.userName = name;
+    }
+
 }
