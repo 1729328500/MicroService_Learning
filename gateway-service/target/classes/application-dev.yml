@@ -1,0 +1,50 @@
+server:
+  port: 9090
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: user_route #路由的唯一标识
+          order: 1 #数字越小，优先级越高
+          uri: lb://user-service #路由匹配地址，从注册中心根据服务名称进行负载均衡路由
+          #断言（可以多个）
+          predicates:
+             #路由匹配的路径
+            - Path=/user/**
+#            - Header=token, \d+
+#            - Query=userId,123
+#             # 时间必须在2025年3月21日23:59:59之前
+#            - Before=2025-03-21T23:59:59+08:00
+#            # 时间必须在2025年3月21日23:59:59之后
+#            - After=2025-03-20T23:59:59+08:00
+#            # 时间必须在这两者之间
+#            - Between=2025-03-20T08:00:00+08:00,2025-03-21T23:59:59+08:00
+#            - JDK=17
+            #过滤器（可以多个）
+          filters:
+            - StripPrefix=1 #转发路由时，去掉一层前缀/User
+            - InvalidParameter=token,-1
+        - id: content_route #路由的唯一标识
+          order: 1 #数字越小，优先级越高
+          uri: lb://content-service #路由匹配地址，从注册中心根据服务名称进行负载均衡路由
+          #断言（可以多个）
+          predicates:
+            - Path=/content/**  #路由匹配的路径
+            - Method=GET
+            #过滤器（可以多个）
+          filters:
+            - StripPrefix=1
+    sentinel:
+      filter:
+        enabled: true
+      transport:
+        port: 8719
+        dashboard: localhost:8888
+      scg:
+        fallback:
+          mode: response
+          response-status: 500
+          response-body: '{"code":500, "msg":网关流量超量!!"}'
