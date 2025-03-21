@@ -3,10 +3,13 @@ package top.whyh.userservice.controller;
 import jakarta.annotation.Resource;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import top.whyh.userservice.config.WhyhProperties;
 import top.whyh.userservice.entity.User;
 import top.whyh.userservice.service.UserService;
+import top.whyh.userservice.config.ApiResponse;
 
 @RestController
 @RequestMapping("/user")
@@ -14,14 +17,17 @@ import top.whyh.userservice.service.UserService;
 public class UserController {
     private final UserService userService;
 
+
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Integer id) {
-        return userService.getFullUserById(id);
+    public ResponseEntity<ApiResponse> getUserById(@PathVariable Integer id) {
+        ApiResponse response = userService.getFullUserById(id);
+        return ResponseEntity.status(response.getCode()).body(response);
     }
 
 
     @Resource
     private RestTemplate restTemplate;  // 确保使用注入的实例
+    private WhyhProperties whyhProperties;
 
     @GetMapping("/user")
     public String getUser(@RequestParam String username) {

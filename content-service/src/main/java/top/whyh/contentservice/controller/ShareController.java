@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import top.whyh.contentservice.entity.Share;
 import top.whyh.contentservice.openfeign.UserFeignClient;
 import top.whyh.contentservice.service.ShareService;
+import top.whyh.contentservice.vo.Result;
 import top.whyh.contentservice.vo.ShareVO;
 import top.whyh.contentservice.vo.UserVO;
 
@@ -19,7 +20,8 @@ public class ShareController {
     @GetMapping("/{id}")
     public ShareVO getShareById(@PathVariable Integer id) {
         Share share = shareService.getShareById(id);
-        UserVO userVO = userFeignClient.getUserById(share.getUserId());
+        Result<UserVO> userResult = userFeignClient.getUserById(share.getUserId());
+        UserVO userVO = userResult.getData(); // 解析 Result<UserVO> 中的数据
 
         return ShareVO.builder()
                 .id(share.getId())
