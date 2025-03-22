@@ -8,5 +8,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "whyh")
 @Data
 public class WhyhProperties {
+    private String username;
+    private String job;
     private Boolean serviceFlag;
 }
